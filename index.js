@@ -68,9 +68,24 @@ app.post('/api/persons', (request, response) => {
     name: body.name,
     number: body.number,
   })
+
   person.save().then(savedContact => {
     response.json(savedContact)
-  })  
+  }) 
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+  const body = request.body
+
+  const person = {
+    name: body.name,
+    number: body.number,
+  }
+  Contact.findByIdAndUpdate(request.params.id, person, { new: true })
+  .then(updatedPerson => {
+    response.json(updatedPerson)
+  })
+  .catch(error => next(error))   
 })
 
 app.use(unknownEndpoint)
