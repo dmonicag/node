@@ -21,20 +21,20 @@ const errorHandler = (error, request, response, next) => {
   console.error(error.message)
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
-  } 
+  }
   else if(error.name === 'ValidationError'){
-    return response.status(400).json({ error: error.message})
+    return response.status(400).json({ error: error.message })
   }
   next(error)
 }
 
 app.get('/api/persons', (request, response) => {
-    Contact.find({}).then(persons => {
-      response.json(persons)
-    })   
+  Contact.find({}).then(persons => {
+    response.json(persons)
+  })
 })
 
-app.get('/info', (request, response) => {  
+app.get('/info', (request, response) => {
   const date = new Date()
   Contact.find({}).then(persons => {
     const total = persons.length
@@ -44,26 +44,26 @@ app.get('/info', (request, response) => {
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
-    Contact.findById(request.params.id)
+  Contact.findById(request.params.id)
     .then(person => {
       if(person){
         response.json(person)
       } else {
         response.status(404).end()
-      }      
+      }
     })
     .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
- Contact.findByIdAndRemove(request.params.id)
-        .then(result => {
-          response.status(204).end()
-        })
-        .catch(error => next(error))
+  Contact.findByIdAndRemove(request.params.id)
+    .then(result => {
+      response.status(204).end()
+    })
+    .catch(error => next(error))
 })
 
-app.post('/api/persons', (request, response, next) => {  
+app.post('/api/persons', (request, response, next) => {
   const body = request.body
   const person = new Contact({
     name: body.name,
@@ -73,27 +73,27 @@ app.post('/api/persons', (request, response, next) => {
   person.save().then(savedContact => {
     response.json(savedContact)
   })
-  .catch(error => {
-    error = person.validateSync()
-    next(error)})
+    .catch(error => {
+      error = person.validateSync()
+      next(error)})
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
- //const body = request.body
+  //const body = request.body
   const { name, number } = request.body
-  Contact.findByIdAndUpdate(request.params.id, 
-                            { name, number }, 
-                            { new: true, runValidators: true, context:'query' })
-          .then(updatedPerson => {
-            response.json(updatedPerson)
-          })
-          .catch(error => next(error)) 
-  })
+  Contact.findByIdAndUpdate(request.params.id,
+    { name, number },
+    { new: true, runValidators: true, context:'query' })
+    .then(updatedPerson => {
+      response.json(updatedPerson)
+    })
+    .catch(error => next(error))
+})
 
 app.use(unknownEndpoint)
 app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
-    console.log(`Server running on PORT ${PORT}`)
+  console.log(`Server running on PORT ${PORT}`)
 })
