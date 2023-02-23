@@ -25,8 +25,6 @@ const errorHandler = (error, request, response, next) => {
   next(error)
 }
 
-//let persons = []
-
 app.get('/api/persons', (request, response) => {
     Contact.find({}).then(persons => {
       response.json(persons)
